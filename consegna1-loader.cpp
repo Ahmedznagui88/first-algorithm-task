@@ -44,23 +44,37 @@ void swap(int &a, int &b) {
     ct_swap++;
 }
 
-void bitonicSortIterative(int *A, int n) {
-    for (int k = 2; k <= n; k <<= 1) {
-        for (int j = k >> 1; j > 0; j >>= 1) {
-            for (int i = 0; i < n; i++) {
-                int l = i ^ j;
-                if (l > i) {
-                    ct_read += 2;
-                    ct_cmp++;
-                    bool asc = (i & k) == 0;
-                    if ((asc && A[i] > A[l]) || (!asc && A[i] < A[l])) {
-                        ct_read += 2;
-                        swap(A[i], A[l]);
-                    }
-                }
+void bitonicMerge(int *A, int low, int count, int direction){
+    if(count > 1){
+        int k = count / 2;
+
+        //* confronto e scambio gli elementi dalle due metà
+        for(int i = low; i < low + k; i++){
+            ct_read += 2;
+            ct_cmp++;
+            //* determinare se due elementi di a sono fuori ordine rispetto alla direzione di ordinamento.
+            if((direction == 1 && A[i] > A[i + k]) || (direction == 0 && A[i] < A[i + k])){
+                ct_read += 2;
+                swap(A[i], A[i + k]);
             }
         }
+
+        bitonicMerge(A, low, k, 1);
+        bitonicMerge(A, low + k, k, direction);
+
     }
+}
+
+void bitonicSort(int *A, int low, int count, int direction){
+    if(count > 1){
+        int k = count / 2;
+
+        bitonicSort(A, low, k, 1);
+        bitonicSort(A, low + k, k, 0);
+        bitonicMerge(A, low, count, direction);
+    }
+
+    
 }
 
 int parse_cmd(int argc, char **argv) {
@@ -130,8 +144,7 @@ int main(int argc, char **argv) {
         }
 
         /// algoritmo di sorting
-        bitonicSortIterative(A, nPadded);
-        
+        bitonicSort(A, 0, nPadded, 1);
 
         if (details) {
             printf("Output:\n");
@@ -155,5 +168,3 @@ int main(int argc, char **argv) {
 
     return 0;
 }
-
-
