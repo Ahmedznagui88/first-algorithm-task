@@ -71,7 +71,7 @@ void bitonicSort(int *A, int low, int count, int direction){
 
         bitonicSort(A, low, k, 1);
         bitonicSort(A, low + k, k, 0);
-        bitonicSort(A, low, count, direction);
+        bitonicMerge(A, low, count, direction);
     }
 
     
